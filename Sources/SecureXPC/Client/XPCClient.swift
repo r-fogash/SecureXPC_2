@@ -152,7 +152,7 @@ public class XPCClient {
     
     private let inProgressSequentialReplies = InProgressSequentialReplies()
     private let serverRequirement: XPCClient.ServerRequirement
-    var connection: xpc_connection_t? = nil
+    public var connection: xpc_connection_t? = nil
     
     internal init(serverRequirement: XPCClient.ServerRequirement) {
         self.serverRequirement = serverRequirement
