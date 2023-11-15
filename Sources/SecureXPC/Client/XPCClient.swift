@@ -183,6 +183,23 @@ public class XPCClient {
     /// ``SequentialResult/finished`` if the sequence has been completed.
     public typealias XPCSequentialResponseHandler<S> = (SequentialResult<S, XPCError>) -> Void
     
+    var errorHandler = ErrorHandler.none
+    
+    /// Sets a handler to synchronously receive any errors encountered.
+    ///
+    /// This will replace any previously set error handler, including an asynchronous one.
+    public func setErrorHandler(_ handler: @escaping (XPCError) -> Void) {
+        self.errorHandler = .sync(handler)
+    }
+    
+    /// Sets a handler to asynchronously receive any errors encountered.
+    ///
+    /// This will replace any previously set error handler, including a synchronous one.
+    @available(macOS 10.15.0, *)
+    public func setErrorHandler(_ handler: @escaping (XPCError) async -> Void) {
+        self.errorHandler = .async(handler)
+    }
+
     /// Sends a request with no message that does not receive a reply.
     ///
     /// - Parameters:
@@ -626,6 +643,7 @@ public class XPCClient {
             inProgressSequentialReplies.handleError(.connectionInterrupted, forConnection: connection)
         }
         
+        errorHandler.handle(.connectionInterrupted)
         // XPC_ERROR_TERMINATION_IMMINENT is not applicable to the client side of a connection
     }
     
